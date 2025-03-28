@@ -1,0 +1,336 @@
+<!DOCTYPE html> 
+<html lang="ku">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG</title>
+
+    <!-- Link to Google Fonts (Noto Kufi Arabic font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full viewport height */
+            text-align: center;
+            position: relative;
+            overflow: hidden; /* Disable scrolling */
+        }
+
+        .quiz-container {
+            width: 800px;
+            background-color: #333;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            text-align: center;
+            margin: 20px;
+            position: relative;
+        }
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #444;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+            color: white; /* Make the answer text color white */
+        }
+
+        .answer-btn:hover {
+            background-color: #555;
+        }
+
+        .correct {
+            background-color: lightgreen;
+        }
+
+        .wrong {
+            background-color: lightcoral;
+        }
+
+        .next-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .next-btn:hover {
+            background-color: #45a049;
+        }
+
+        #feedback {
+            margin-top: 20px;
+        }
+
+        /* Styling for the question label in the top-right corner */
+        #questionLabel {
+            position: absolute;
+            top: 10px; /* Place it at the top-right corner */
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 18px;
+            text-align: right;
+            background: none; /* Removed the black background */
+        }
+
+        /* Styling for the scores display, placed below the question label */
+        #score-container {
+            position: absolute;
+            top: 40px; /* Move it below the question label */
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 18px;
+            text-align: right;
+            background: none; /* Removed the black background */
+        }
+
+        #correct-score,
+        #incorrect-score {
+            margin: 0;
+        }
+
+        /* Styling for the result text */
+        .result-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .final-message {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Center the final messages */
+        .final-container {
+            text-align: center;
+        }
+
+        /* Adjust final result position */
+        .final-message {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Question label in the top-right corner -->
+    <div id="questionLabel">پسیارا 1</div>
+
+    <!-- Score display below the question label -->
+    <div id="score-container">
+        <div id="correct-score">درست: 0</div>
+        <div id="incorrect-score">خەلەت: 0</div>
+    </div>
+
+    <div class="quiz-container">
+        <div id="question" class="question">کەسێکی تایبەتی لە PUBG کە خۆی بە شێوەیەکی تایبەتی دیاری دەکات؟</div>
+        <button class="answer-btn" onclick="checkAnswer(0)">PlayerUnknown</button>
+        <button class="answer-btn" onclick="checkAnswer(1)">PUBG Corporation</button>
+        <button class="answer-btn" onclick="checkAnswer(2)">Bluehole</button>
+        <button class="answer-btn" onclick="checkAnswer(3)">PlayerOne</button>
+        <p id="feedback"></p>
+        <button id="nextBtn" class="next-btn" onclick="nextQuestion()" style="display: none;">پرسیارا دیڤدا</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "ناڤێ پوبجی یێ درست چیە؟",
+                answers: ["A) Player Unknown's Battleground", "B) Battlegrounds Royale", "C) PlayerUnknown's Battle Royale", "D) Bluehole Royale"],
+                correct: 2
+            },
+            {
+                question: "ئێکەم سیارا هاتی د پوبجی دا کیشک بی ؟",
+                answers: ["A) UAZ", "B) Dacia", "C) Buggy", "D) Mirado"],
+                correct: 1
+            },
+            {
+                question: "ئێکەم ماپا هاتی د پوبجی دا پشتی ماپا ( ئیرەنگل) ؟",
+                answers: ["A) Vikendi", "B) Miramar", "C) Sanhok", "D) Taego"],
+                correct: 1
+            },
+            {
+                question: "کیش سیلەح بی هاتی ژێبرن پشتی ئوپدەیتا ۲۰۱۹ ؟",
+                answers: ["A) VSS", "B) DP-28", "C) R45", "D) M16A4"],
+                correct: 2
+            },
+            {
+                question: "بیت ؟ Auto چەند فیشەکا د سانیەکێدا د هاڤێت ئەگەر Mk14 سیلەحێ  ",
+                answers: ["A) 7 فیشەک", "B) 9 فیشەک", "C) 11 فیشەک", "D) 13 فیشەک"],
+                correct: 2
+            },
+            {
+                question: "د درۆپێ دا چەندە ؟ AWM ئەمەلێ دیتنا ",
+                answers: ["A) 10%", "B) 12%", "C) 14%", "D) 16%"],
+                correct: 2
+            },
+            {
+                question: "دێ چەند دەم چت ئەگەر تو خوینا خو ژ ۱ بکی ۱۰۰ بتنێ ب باندجا ؟",
+                answers: ["A) 40 سانی", "B) 50 سانی", "C) 60 سانی", "D) 70 سانی"],
+                correct: 2
+            },
+            {
+                question: "بو هاتی کیشک بی ؟ Kill Message ئێکەم سیلەح کو  ",
+                answers: ["A) M416", "B) AKM", "C) M16A4", "D) UMP"],
+                correct: 0
+            },
+            {
+                question: "د پوبجی دا بەردەست بی ؟ Erangle 2.0 ل کیش سیزنی  ",
+                answers: ["A) Season 12", "B) Season 15", "C) Season 14", "D) Season 17"],
+                correct: 3
+            },
+            {
+                question: "کیشک ژ ڤان سیلەحا ب لەزترینە بو فیشەک هاڤێتنێ ؟",
+                answers: ["A) Vector", "B) UZI", "C) P90", "D) M416"],
+                correct: 1
+            },
+            {
+                question: "چەند فیشەکا د سانیەکێ دا دهاڤێت ؟ UZI سیلەحێ  ",
+                answers: ["A) 18", "B) 16", "C) 14", "D) 20"],
+                correct: 0
+            },
+            {
+                question: "دیشێت چەند خوینا تە تژی کت ؟ Energy Drink",
+                answers: ["A) 23%", "B) 40%", "C) 38%", "D) 25%"],
+                correct: 2
+            },
+            {
+                question: "دێ چەند دەم چت حەتا لاعبەکێ کەتی دمرت بێی کو ئێک وی ساخکت ؟",
+                answers: ["A) 50سانی", "B) 60سانی", "C) 85سانی", "D) 100سانی"],
+                correct: 2
+            },
+            {
+                question: "د ۱ سانیدا چەند میترا دچت ؟ M24 sniper فیشەکا  ",
+                answers: ["A) 790 m", "B) 880 m", "C) 910 m", "D) 960 m"],
+                correct: 2
+            },
+            {
+                question: "کیشک ژ ڤان سیلەحا ب لەزترینە بو فیشەک هاڤێتنێ ؟",
+                answers: ["A) Vector", "B) UZI", "C) P90", "D) M416"],
+                correct: 1
+            },
+            {
+                question: "چەند سانیا دا رومانە د پەقیت ؟",
+                answers: ["A) 3.5سانی", "B) 4.0سانی", "C) 4.5سانی", "D) 5.0سانی"],
+                correct: 2
+            },
+            {
+                question: " دیراتیا 400 میترا ببرت ؟ AWM دێ چەند دەم چت حەتا فیشەکا ",
+                answers: ["A) 0.3سانی", "B) 0.4سانی", "C) 0.5سانی", "D) 0.6سانی"],
+                correct: 1
+            },
+            {
+                question: "ئاقلەویک چەند خوینێ دبت ئەگەر بدانی سەرێ ئێکی و کولاڤێ لیڤل ۱ لبەر بیت ؟",
+                answers: ["A) 60", "B) 65", "C) 70", "D) 75"],
+                correct: 2
+            },
+            {
+                question: " کاشی دێ ؟ AWM چەند دەم دێ چت حەتا ",
+                answers: ["A) 3.5سانی", "B) 4.0سانی", "C) 4.6سانی", "D) 5.0سانی"],
+                correct: 2
+            },
+            {
+                question: "دا ؟ Erangle دبن د ماپا SPAWN چەند کولاڤ ",
+                answers: ["A) 500", "B) 750", "C) 1000", "D) 1200"],
+                correct: 2
+            },
+            {
+                question: "پەقینا رومانێ دێ چەند خوینا تە بت ئەگەر تو ۱ میتر ژێ دیربێ ؟",
+                answers: ["A) 150", "B) 170", "C) 200", "D) 220"],
+                correct: 2
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let totalCorrect = 0; // Total correct answers
+        let totalIncorrect = 0; // Total incorrect answers
+
+        function loadQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            document.getElementById("question").textContent = currentQuestion.question;
+            const buttons = document.querySelectorAll(".answer-btn");
+            buttons.forEach((button, index) => {
+                button.textContent = currentQuestion.answers[index];
+                button.classList.remove("correct", "wrong");
+                button.disabled = false; // Re-enable the buttons for the next question
+            });
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("nextBtn").style.display = "none";
+            // Display question number (like "پسیارا 1", "پسیارا 2", etc.)
+            document.getElementById("questionLabel").textContent = `پسیارا ${currentQuestionIndex + 1}`;
+        }
+
+        function checkAnswer(index) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const buttons = document.querySelectorAll(".answer-btn");
+
+            // Disable all buttons after an answer is selected
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+
+            if (index === currentQuestion.correct) {
+                buttons[index].classList.add("correct");
+                document.getElementById("feedback").textContent = "درستە";
+                totalCorrect++; // Increment total correct score
+            } else {
+                buttons[index].classList.add("wrong");
+                // Highlight the correct answer in green
+                buttons[currentQuestion.correct].classList.add("correct");
+                document.getElementById("feedback").textContent = "خەلەتە";
+                totalIncorrect++; // Increment total incorrect score
+            }
+
+            // Update the total score displays
+            document.getElementById("correct-score").textContent = "درست: " + totalCorrect;
+            document.getElementById("incorrect-score").textContent = "خەلەت: " + totalIncorrect;
+            document.getElementById("nextBtn").style.display = "inline-block"; // Show the "Next Question" button
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                // Display the custom message based on total correct answers
+                let message = totalCorrect < 10 ? "پیرۆزبت تە چ ژێ چێنەکر🐸" : "عەفیە عەفیە 🐒";
+                document.querySelector(".quiz-container").innerHTML = 
+                    `<div class="final-container">
+                        <div class="final-message">دوماهیک هات</div>
+                        <div class="result-message">${message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
